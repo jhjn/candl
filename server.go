@@ -101,6 +101,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"Title":     page.Title,
 		"Content":   page.HTML,
 		"Backlinks": page.Backlinks,
+		"Date":      time.Now().Format("2006-01-02"),
 	}); err != nil {
 		log.Printf("template error: %v", err)
 	}
