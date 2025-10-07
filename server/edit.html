@@ -43,18 +43,12 @@
         }
 
         #editor {
-            width: 100%;
             min-height: calc(100vh - 80px);
             border: none;
             border-radius: 0;
             outline: none;
             resize: none;
-            padding: 20px;
             margin-bottom: 80px; /* Space for buttons */
-            font-family: Monaco, 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            background-color: var(--bg-color);
             color: var(--text-color);
             box-sizing: border-box;
             overflow-y: auto;
@@ -95,8 +89,45 @@
             transform: translateY(-2px);
         }
 
+        .editor-container textarea,
+        .editor-container .highlight-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            margin: 0;
+            border: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-family: Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            box-sizing: border-box;
+            letter-spacing: normal;
+            tab-size: 4;
+        }
+        
+        .editor-container textarea {
+            background: transparent;
+        }
+        
+        .editor-container .highlight-layer {
+            color: transparent;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .highlight-layer .wiki-link {
+            background: rgb(108, 55, 87);
+            border-radius: 3px;
+        }
+
         @media (max-width: 768px) {
-            #editor {
+            .editor-container textarea,
+            .editor-container .highlight-layer {
                 padding: 15px; /* tighter */
                 font-size: 16px; /* Prevents zoom on mobile */
             }
@@ -111,28 +142,60 @@
                 right: 15px;
             }
         }
+
     </style>
 </head>
 <body>
 <form action="/api/edit/{{.Name}}" id="pad" method="post">
-    <textarea name="body" id="editor" autofocus placeholder="creating /{{.Name}} ...">{{.Markdown}}</textarea>
+    <div class="editor-container">
+        <div class="highlight-layer" id="highlight"></div> <!-- highlight layer underneath -->
+        <textarea name="body" id="editor" autofocus spellcheck="false" placeholder="creating /{{.Name}} ...">{{.Markdown}}</textarea>
+    </div>
     <input type="text" id="name-input" class="btn" name="name" value="{{.Name}}" style="padding: 10px 10px">
     <input type="submit" id="save-btn" class="btn btn-blue" value="save">
-    <!-- <link rel="stylesheet" type="text/css" href="/MarkdownArea.css">
-    <script src="/MarkdownArea.js" defer></script> -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const editor = document.getElementById('editor');
-            const form = document.getElementById('pad');
-            
-            editor.addEventListener('keydown', function(e) {
-                // Check for Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
-                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-                    e.preventDefault();
-                    form.submit();
-                }
-            });
+        const editor = document.getElementById('editor');
+        const highlight = document.getElementById('highlight');
+        const form = document.getElementById('pad');
+        
+        // Cmd-Enter to save
+        editor.addEventListener('keydown', function(e) {
+            // Check for Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                form.submit();
+            }
         });
+
+        // Add highlights to text
+        function escapeHtml(text) {
+          return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+        
+        function updateHighlight() {
+          const text = escapeHtml(editor.value);
+          const highlighted = text.replace(
+            /\[\[([^\]]+)\]\]/g,
+            '<span class="wiki-link">[[$1]]</span>'
+          );
+          highlight.innerHTML = highlighted;
+          syncScroll();
+        }
+        
+        function syncScroll() {
+          highlight.scrollTop = editor.scrollTop;
+          highlight.scrollLeft = editor.scrollLeft;
+        }
+        
+        editor.addEventListener('input', updateHighlight);
+        editor.addEventListener('scroll', syncScroll);
+        
+        updateHighlight();
     </script>
 </form>
 </body>
