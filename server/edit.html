@@ -120,10 +120,13 @@
             overflow: hidden;
         }
         
-        .highlight-layer .wiki-link {
-            background: rgb(108, 55, 87);
+        .highlight-layer span {
             border-radius: 3px;
         }
+
+        .highlight-layer .wiki-link {background: rgb(108, 55, 87)}
+        .highlight-layer .header {background: rgb(108, 55, 55)}
+        .highlight-layer .code {background: rgb(105, 55, 108)}
 
         @media (max-width: 768px) {
             .editor-container textarea,
@@ -182,6 +185,12 @@
           const highlighted = text.replace(
             /\[\[([^\]]+)\]\]/g,
             '<span class="wiki-link">[[$1]]</span>'
+          ).replace(
+            /(?:^|\n)(#+\s*[^\n]+)/g,
+            '<span class="header">$1</span>'
+          ).replace(
+            /(`[^`]+`)/g,
+            '<span class="code">$1</span>'
           );
           highlight.innerHTML = highlighted;
           syncScroll();
