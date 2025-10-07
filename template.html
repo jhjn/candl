@@ -8,21 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-<div class="edit-menu">
-    <img src="https://openmoji.org/data/color/svg/270F.svg" class="edit-option" onclick="toggleEditMenu()" alt="Edit options"/>
-    <div class="edit-grid" id="editOptions">
-        <a href="/api/edit/{{.Date}}" class="edit-option">
-            <img src="https://openmoji.org/data/color/svg/1F4C5.svg" alt="New"/>
-        </a>
-        <a href="/api/edit/{{.Name}}" class="edit-option">
-            <img src="https://openmoji.org/data/color/svg/270F.svg" alt="Edit"/>
-        </a>
-        <div></div> <!-- Empty space for bottom-left-->
-        <a href="/api/rename/{{.Name}}" class="edit-option">
-            <img src="https://openmoji.org/data/color/svg/1F3F7.svg" alt="Rename"/>
-        </a>
-    </div>
-</div>
+<a style="width: 2em; position: fixed; top: 20px; right: 20px;" href="/api/edit/{{.Name}}"><img src="https://openmoji.org/data/color/svg/270F.svg"/></a>
 <nav>
     {{ if .Backlinks }}
     <ul>
@@ -35,34 +21,5 @@
 <main>
     {{ .Content }}
 </main>
-<script>
-function toggleEditMenu() {
-    const options = document.getElementById('editOptions');
-    options.classList.toggle('show');
-}
-
-// Close menu when clicking outside
-document.addEventListener('click', function(event) {
-    const menu = document.querySelector('.edit-menu');
-    const options = document.getElementById('editOptions');
-    
-    if (!menu.contains(event.target)) {
-        options.classList.remove('show');
-    }
-});
-
-// Close menu on escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        document.getElementById('editOptions').classList.remove('show');
-    }
-
-    // Edit page on Cmd+E or Ctrl+E
-    if ((event.metaKey || event.ctrlKey) && event.key === 'e') {
-        event.preventDefault();
-        window.location.href = "/api/edit/{{.Name}}";
-    }
-});
-</script>
 </body>
 </html>
