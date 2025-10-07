@@ -7,11 +7,14 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 
+	fences "github.com/stefanfritsch/goldmark-fences"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 )
 
@@ -70,7 +73,8 @@ func getPages(dir string) (map[string]*Page, error) {
 
 	// First pass: extract outbound links and render HTML
 	md := goldmark.New(
-		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithExtensions(extension.GFM, &fences.Extender{}),
+		goldmark.WithParserOptions(parser.WithAttribute()),
 		goldmark.WithRendererOptions(html.WithUnsafe()),
 	)
 
@@ -120,6 +124,7 @@ func getPages(dir string) (map[string]*Page, error) {
 			arr = append(arr, k)
 		}
 		pages[name].Backlinks = arr
+		slices.Sort(pages[name].Backlinks)
 	}
 	return pages, nil
 }

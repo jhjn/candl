@@ -1,13 +1,3 @@
-html {
-	box-sizing: border-box;
-}
-
-*,
-*:before,
-*:after {
-	box-sizing: inherit;
-}
-
 body {
 	font-family: system-ui;
 	font-size: 16px;
@@ -19,7 +9,7 @@ body {
 }
 
 a {
-	color: #545
+	color: rgb(152, 69, 119)
 }
 
 img {
@@ -30,7 +20,7 @@ pre {
 	overflow: auto
 }
 
-textarea {
+/* textarea {
 	font-family: monospace;
 	font-size: 16px;
 	outline: none;
@@ -39,7 +29,7 @@ textarea {
 summary:focus,
 textarea:focus {
 	outline: none !important
-}
+} */
 
 details {
 	margin-bottom: 1em
@@ -58,6 +48,16 @@ body>nav ul>li {
 	display: inline-block;
 	margin-top: 0.5rem;
 	margin-right: 0.5rem;
+}
+
+/* Laptop-specific styling */
+@media screen and (min-width: 900px) {
+
+}
+
+/* Mobile-specific styling */
+@media screen and (max-width: 900px) {
+
 }
 
 /* @media screen and (min-width: 900px) {
@@ -98,7 +98,7 @@ body>nav ul>li {
 } */
 
 /* For precise styling */
-.article {
+/* .article {
 	margin-bottom: 1rem;
 	display: flex;
 	flex-direction: column;
@@ -157,4 +157,4 @@ input {
 	margin-top: 3rem;
 	padding-top: 1rem;
 	border-top: 1px solid #eee;
-}
+} */
