@@ -4,6 +4,8 @@
     <title>Edit: {{.Name}}</title>
     <meta charset=utf-8>
     <meta name=viewport content="width=device-width,initial-scale=1">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1e7da">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#02262c">
     <link rel="shortcut icon" href="/favicon.svg"/>
     <style>
         :root {
@@ -42,6 +44,7 @@
             flex: 1;
             width: 100%;
             border: none;
+            border-radius: 0;
             outline: none;
             resize: none;
             padding: 20px;
@@ -52,17 +55,27 @@
             color: var(--text-color);
         }
 
-        .btn {
+        #name-input {
+            position: fixed;
+            bottom: 20px;
+            right: 100px;
+            z-index: 1000;
+        }
+        
+        #save-btn {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            z-index: 1000;
+        }
+
+        .btn {
             padding: 10px 20px;
             border: none;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            z-index: 1000;
         }
 
         .btn-blue {
@@ -77,15 +90,18 @@
 
         @media (max-width: 768px) {
             #editor {
-                padding: 15px;
+                padding: 15px; /* tighter */
                 font-size: 16px; /* Prevents zoom on mobile */
             }
             
-            .btn {
+            #name-input {
                 bottom: 15px;
+                right: 95px;
+            }
+        
+            #save-btn {
+                bottom: 15px; /* tighter */
                 right: 15px;
-                padding: 10px 20px;
-                font-size: 13px;
             }
         }
     </style>
@@ -93,7 +109,8 @@
 <body>
 <form action="/api/edit/{{.Name}}" id="pad" method="post">
     <textarea name="body" id="editor" autofocus placeholder="creating /{{.Name}} ...">{{.Markdown}}</textarea>
-    <input type="submit" class="btn btn-blue" value="save" accesskey="s">
+    <input type="text" id="name-input" class="btn" name="name" value="{{.Name}}" style="padding: 10px 10px">
+    <input type="submit" id="save-btn" class="btn btn-blue" value="save">
     <!-- <link rel="stylesheet" type="text/css" href="/MarkdownArea.css">
     <script src="/MarkdownArea.js" defer></script> -->
     <script>
