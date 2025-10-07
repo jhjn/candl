@@ -116,6 +116,10 @@ func getPages(dir string) (map[string]*Page, error) {
 	)
 
 	for _, p := range pages {
+		// Process title (if '# ' get string until newline)
+		if strings.HasPrefix(p.Raw, "# ") {
+			p.Title = strings.TrimSpace(p.Raw[2:strings.Index(p.Raw, "\n")])
+		}
 		// Process wikilinks
 		processed := linkRe.ReplaceAllStringFunc(p.Raw, func(m string) string {
 			sub := linkRe.FindStringSubmatch(m)
