@@ -1,11 +1,17 @@
-// lpage wiki
+// lpage-wiki
 // ----------
+// A simple web server for a local wiki directory.
 //
-// - load Markdown files from a directory
-// - parse [[wikilinks]] and build backlinks
-// - render Markdown -> HTML using goldmark
-// - serve pages via net/http with a template
-// - optional fsnotify-based watcher to auto-reload
+// Features:
+// - load Markdown files from a directory, converting with
+//   - gfm
+//   - [[foo]] wikilinks
+//   - ::: div fences and {.foo} attrs
+// - parse [[wikilinks]] and build and display backlinks
+// - edit pages from site
+// - create today's diary page
+// - page /search will automatically have backlinks from every page
+// - watch directory and automatically reload if wiki files change
 
 package main
 
