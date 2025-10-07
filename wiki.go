@@ -109,6 +109,7 @@ func getPages(dir string) (map[string]*Page, error) {
 	}
 
 	// First pass: extract outbound links and render HTML
+	// NOTE: In future add https://github.com/yuin/goldmark-highlighting
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM, &fences.Extender{}),
 		goldmark.WithParserOptions(parser.WithAttribute()),
@@ -172,6 +173,7 @@ func getPages(dir string) (map[string]*Page, error) {
 
 // Scan directory for .md files and build pages with backlinks.
 // NOTE: Later handle updating the template if it changes.
+// NOTE: Implement the updating of single files!
 func (w *Wiki) Update() error {
 	pages, err := getPages(w.Dir)
 	if err != nil {
@@ -181,4 +183,9 @@ func (w *Wiki) Update() error {
 	w.Pages = pages
 	w.mu.Unlock()
 	return nil
+}
+
+func (w *Wiki) WritePage(name string, content string) error {
+	path := filepath.Join(w.Dir, name+".md")
+	return os.WriteFile(path, []byte(content), 0644)
 }
