@@ -96,6 +96,20 @@
     <input type="submit" class="btn btn-blue" value="save" accesskey="s">
     <!-- <link rel="stylesheet" type="text/css" href="/MarkdownArea.css">
     <script src="/MarkdownArea.js" defer></script> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            const form = document.getElementById('pad');
+            
+            editor.addEventListener('keydown', function(e) {
+                // Check for Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    form.submit();
+                }
+            });
+        });
+    </script>
 </form>
 </body>
 </html>
