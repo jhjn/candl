@@ -51,7 +51,7 @@ func (a *Api) servePostEdit(w http.ResponseWriter, r *http.Request) {
 	body := r.FormValue("body")
 
 	// If page doesn't exist make sure the name is valid!
-	if matched, err := regexp.MatchString("^[a-zA-Z0-9_]+$", name); err != nil || !matched {
+	if matched, err := regexp.MatchString("^[a-zA-Z0-9_+-]+$", name); err != nil || !matched {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
