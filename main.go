@@ -12,9 +12,7 @@ package main
 import (
 	_ "embed"
 	"flag"
-	"log"
 	"log/slog"
-	"net/http"
 )
 
 func main() {
@@ -28,16 +26,9 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
-	r, cancel, err := GetServer(*dir, *watch)
-	if cancel != nil {
-		defer cancel()
-	}
+	err := Serve(*dir, *port, *watch)
 	if err != nil {
-		log.Fatalf("failed to load wiki: %v", err)
+		slog.Error("failed to load wiki", "error", err)
 	}
 
-	slog.Info("serving", "wiki", *dir, "port", *port)
-	if err := http.ListenAndServe(":"+*port, r); err != nil {
-		log.Fatalf("server error: %v", err)
-	}
 }

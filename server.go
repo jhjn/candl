@@ -4,7 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"html/template"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -79,12 +79,7 @@ func GetStyle(dir string) (string, error) {
 
 // The handler for all wiki pages
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var name string
-	if r.URL.Path == "/" {
-		name = "index"
-	} else {
-		name = r.URL.Path[1:]
-	}
+	name := r.PathValue("name")
 
 	s.wiki.mu.RLock()
 	page, ok := s.wiki.Pages[name]
@@ -103,7 +98,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"Backlinks": page.Backlinks,
 		"Date":      time.Now().Format("2006-01-02"),
 	}); err != nil {
-		log.Printf("template error: %v", err)
+		slog.Error("page template execute", "error", err)
 	}
 }
 
@@ -138,35 +133,40 @@ func WatchDir(ctx context.Context, wiki *Wiki) error {
 			debounce.Reset(200 * time.Millisecond)
 		case <-debounce.C:
 			if err := wiki.Update(); err != nil {
-				log.Printf("reload error: %v", err)
+				slog.Error("wiki update failure", "error", err)
 				continue
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {
 				return nil
 			}
-			log.Println("watcher error:", err)
+			slog.Error("watcher failure", "error", err)
 		}
 	}
 }
 
-func GetServer(dir string, watch bool) (*http.ServeMux, context.CancelFunc, error) {
+func Serve(dir string, port string, watch bool) error {
 	wiki, err := NewWiki(dir)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	if err := wiki.Update(); err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	style, err := GetStyle(dir)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
+	server := &Server{wiki: wiki}
+
 	r := http.NewServeMux()
-	r.Handle("/", &Server{wiki: wiki})
+	r.Handle("/{$}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
+	}))
+	r.Handle("/{name}", server)
 	r.Handle("/style.css", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(style))
@@ -175,9 +175,10 @@ func GetServer(dir string, watch bool) (*http.ServeMux, context.CancelFunc, erro
 
 	if watch {
 		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		go WatchDir(ctx, wiki)
-		return r, cancel, nil
 	}
 
-	return r, nil, nil
+	slog.Info("serving", "wiki", dir, "port", port)
+	return http.ListenAndServe(":"+port, r)
 }
