@@ -107,6 +107,13 @@ func getPages(dir string) (map[string]*Page, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Add /search page if it doesn't exist
+	if _, ok := pages["search"]; !ok {
+		pages["search"] = &Page{
+			Name: "search",
+			Raw:  "# Search",
+		}
+	}
 
 	// First pass: extract outbound links and render HTML
 	// NOTE: In future add https://github.com/yuin/goldmark-highlighting
@@ -118,7 +125,7 @@ func getPages(dir string) (map[string]*Page, error) {
 
 	for _, p := range pages {
 		// Process title (if '# ' get string until newline)
-		if strings.HasPrefix(p.Raw, "# ") {
+		if strings.HasPrefix(p.Raw, "# ") && strings.Index(p.Raw, "\n") > 0 {
 			p.Title = strings.TrimSpace(p.Raw[2:strings.Index(p.Raw, "\n")])
 		}
 		// Process wikilinks
@@ -159,6 +166,8 @@ func getPages(dir string) (map[string]*Page, error) {
 				pageLinkers[target][linker] = struct{}{}
 			}
 		}
+		// Every page implicitly links to 'search'
+		pageLinkers["search"][linker] = struct{}{}
 	}
 	for name, mset := range pageLinkers {
 		arr := []string{}
