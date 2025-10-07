@@ -168,8 +168,7 @@ func loadPage(path string) (*Page, error) {
 
 // Create page data from a directory
 func loadPages(dir string) (map[string]*Page, error) {
-	pages := map[string]*Page{}
-
+	var mdFiles []string
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -178,17 +177,54 @@ func loadPages(dir string) (map[string]*Page, error) {
 			return nil
 		}
 		if strings.HasSuffix(d.Name(), ".md") {
-			page, err := loadPage(path)
-			if err != nil {
-				return err
-			}
-			pages[page.Name] = page
+			mdFiles = append(mdFiles, path)
 		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	// Load pages concurrently
+	pageCh := make(chan *Page)
+	errCh := make(chan error, 1)
+	var wg sync.WaitGroup
+	for _, path := range mdFiles {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			page, err := loadPage(path)
+			if err != nil {
+				select {
+				case errCh <- fmt.Errorf("error loading page %s: %w", path, err):
+				default:
+				}
+				return
+			}
+			pageCh <- page
+		}()
+	}
+
+	// Close page channel when all workers are done
+	go func() {
+		wg.Wait()
+		close(pageCh)
+	}()
+
+	// Process pages as they come in
+	pages := map[string]*Page{}
+	for page := range pageCh {
+		pages[page.Name] = page
+	}
+
+	// Abort if any page errored. NOTE: could be better.
+	select {
+	case err := <-errCh:
+		return nil, err
+	default:
+	}
+
 	// Add /search page if it doesn't exist
 	if _, ok := pages["search"]; !ok {
 		pages["search"] = &Page{
