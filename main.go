@@ -28,7 +28,10 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
-	r, err := GetServer(*dir, *watch)
+	r, cancel, err := GetServer(*dir, *watch)
+	if cancel != nil {
+		defer cancel()
+	}
 	if err != nil {
 		log.Fatalf("failed to load wiki: %v", err)
 	}

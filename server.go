@@ -149,19 +149,19 @@ func WatchDir(ctx context.Context, wiki *Wiki) error {
 	}
 }
 
-func GetServer(dir string, watch bool) (*http.ServeMux, error) {
+func GetServer(dir string, watch bool) (*http.ServeMux, context.CancelFunc, error) {
 	wiki, err := NewWiki(dir)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := wiki.Update(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	style, err := GetStyle(dir)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	r := http.NewServeMux()
@@ -174,9 +174,9 @@ func GetServer(dir string, watch bool) (*http.ServeMux, error) {
 
 	if watch {
 		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
 		go WatchDir(ctx, wiki)
+		return r, cancel, nil
 	}
 
-	return r, nil
+	return r, nil, nil
 }
