@@ -173,6 +173,8 @@ func (w *Wiki) Update() error {
 	if err != nil {
 		return err
 	}
+	w.mu.Lock()
 	w.Pages = pages
+	w.mu.Unlock()
 	return nil
 }
