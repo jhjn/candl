@@ -1,15 +1,22 @@
+/* Colour definitions (default: light) */
+:root {
+  --bg-color: #f1e7da;
+  --text-color: #222;
+  --link-color: rgb(152, 69, 119);
+}
+
 body {
 	font-family: system-ui;
 	font-size: 16px;
 	max-width: 80ch;
 	margin: auto;
 	padding: 2ch;
-	color: #222;
-	background: #f1e7da;
+	color: var(--text-color);
+	background: var(--bg-color);
 }
 
 a {
-	color: rgb(152, 69, 119)
+	color: var(--link-color)
 }
 
 img {
@@ -20,32 +27,9 @@ pre {
 	overflow: auto
 }
 
-/* textarea {
-	font-family: monospace;
-	font-size: 16px;
-	outline: none;
-}
-
-summary:focus,
-textarea:focus {
-	outline: none !important
-} */
-
-details {
-	margin-bottom: 1em
-}
-
-/* For the header/nav/main framing */
-
 body>nav ul {
 	padding: 0;
-	margin: 0 0 5px 0;
-}
-
-body>nav ul>li {
 	list-style-type: none;
-	margin-top: 0.5rem;
-	margin-right: 0.5rem;
 }
 
 /* Laptop-specific styling */
@@ -55,11 +39,24 @@ body>nav ul>li {
 	nav  {flex: 1; margin-top: 4em}
 	main {flex: 6}
 
+	body>nav ul>li {
+		margin-top: 0.5rem;
+	}
 }
 
 /* Mobile-specific styling */
 @media screen and (max-width: 800px) {
 	body>nav ul>li {
 		display: inline-block; /* sideways nav */
+		margin-right: 0.5rem;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	/* Colour definitions (dark) */
+	:root {
+		--bg-color: #02262c;
+		--text-color: #beaf9c;
+		--link-color: rgb(167, 86, 135);
 	}
 }
