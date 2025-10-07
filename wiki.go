@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"unicode"
 
 	fences "github.com/stefanfritsch/goldmark-fences"
 	"github.com/yuin/goldmark"
@@ -41,6 +42,42 @@ type Wiki struct {
 
 // regex for wikilinks like [[Some Page]] or [[Some Page|Label]]
 var linkRe = regexp.MustCompile(`\[\[([^\]|]+)(?:\|([^\]]+))?\]\]`)
+
+func sortBacklinks(a, b string) int {
+	// Check if strings start with digits
+	aBeginsNum := len(a) > 0 && unicode.IsDigit(rune(a[0]))
+	bBeginsNum := len(b) > 0 && unicode.IsDigit(rune(b[0]))
+
+	if !aBeginsNum && bBeginsNum {
+		return -1 // a (alpha) comes before b (numeric)
+	}
+	if aBeginsNum && !bBeginsNum {
+		return 1 // b (alpha) comes before a (numeric)
+	}
+	// Both are alphabetic - normal sort
+	if !aBeginsNum && !bBeginsNum {
+		if a < b {
+			return -1
+		}
+		if a > b {
+			return 1
+		}
+		return 0
+	}
+
+	// Both are numeric - reverse sort (highest to lowest)
+	if aBeginsNum && bBeginsNum {
+		if a < b {
+			return 1
+		}
+		if a > b {
+			return -1
+		}
+		return 0
+	}
+
+	return 0 // Should never reach here
+}
 
 // Create page data from a directory
 func getPages(dir string) (map[string]*Page, error) {
@@ -124,7 +161,7 @@ func getPages(dir string) (map[string]*Page, error) {
 			arr = append(arr, k)
 		}
 		pages[name].Backlinks = arr
-		slices.Sort(pages[name].Backlinks)
+		slices.SortFunc(pages[name].Backlinks, sortBacklinks)
 	}
 	return pages, nil
 }
