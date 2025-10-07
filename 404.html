@@ -6,33 +6,14 @@
     <meta charset=utf-8>
     <meta name=viewport content="width=device-width,initial-scale=1">
     <link rel="shortcut icon" href="/favicon.svg"/>
-    <style>
-        :root {
-            --bg-color: #f1e7da;
-            --text-color: #222;
-  --link-color: rgb(152, 69, 119);
-        }
-        @media (prefers-color-scheme: dark) {
-            /* Colour definitions (dark) */
-            :root {
-                --bg-color: #02262c;
-                --text-color: #beaf9c;
-                --link-color: rgb(167, 86, 135);
-            }
-        }
-
-        html {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-        a {
-            color: var(--link-color)
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-<p>404 page not found
-<p>
-<p><a href="/api/edit/{{.}}">create this page</a>
+<div style="margin: auto; display: flex; flex-direction: column; justify-content: center;">
+<p>404 page not found</p>
+<a class="btn btn-blue" style="text-decoration: none;" href="/api/edit/{{.}}">
+    create /{{.}}
+</a>
+</div>
 </body>
 </html>

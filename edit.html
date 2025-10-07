@@ -75,13 +75,6 @@
             transform: translateY(-2px);
         }
 
-        /* Keyboard shortcut hint */
-        .btn::after {
-            content: " (Alt+S)";
-            font-size: 11px;
-            opacity: 0.7;
-        }
-
         @media (max-width: 768px) {
             #editor {
                 padding: 15px;
@@ -99,8 +92,8 @@
 </head>
 <body>
 <form action="/api/edit/{{.Name}}" id="pad" method="post">
-    <textarea name="body" id="editor" autofocus placeholder="new page...">{{.Markdown}}</textarea>
-    <input type="submit" class="btn btn-blue" value="Submit" accesskey="s">
+    <textarea name="body" id="editor" autofocus placeholder="creating /{{.Name}} ...">{{.Markdown}}</textarea>
+    <input type="submit" class="btn btn-blue" value="save" accesskey="s">
     <!-- <link rel="stylesheet" type="text/css" href="/MarkdownArea.css">
     <script src="/MarkdownArea.js" defer></script> -->
 </form>

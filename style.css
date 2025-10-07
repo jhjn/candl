@@ -27,7 +27,11 @@ pre {
 	overflow: auto
 }
 
-body>nav ul {
+li {
+	padding-bottom: 3px;
+}
+
+nav ul {
 	padding: 0;
 	list-style-type: none;
 }
@@ -60,6 +64,37 @@ body>nav ul {
 		--link-color: rgb(167, 86, 135);
 	}
 }
+
+/*
+ * Buttons
+ * -------
+ */
+.btn {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.btn-blue {
+	background-color: #005ec3;
+	color: white;
+}
+
+.btn-blue:hover {
+	background-color: #0056b3;
+	transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+	.btn {
+		padding: 10px 20px;
+		font-size: 13px;
+	}
+}
+
 
 /*
  * Edit menu
