@@ -1,4 +1,4 @@
-// lpage-wiki
+// candl-wiki
 // ----------
 // A simple web server for a local wiki directory.
 //

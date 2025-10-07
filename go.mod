@@ -1,4 +1,4 @@
-module jenne.uk/lpage
+module github.com/jhjn/candl
 
 go 1.25.1
 
