@@ -90,12 +90,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" {
 		name = "index"
 	} else {
-		name = r.URL.Path
+		name = r.URL.Path[1:]
 	}
 
 	s.wiki.mu.RLock()
-	// Debug log the keys
-	slog.Debug("serving page", "name", name, "dir", s.wiki.Dir, "keys", s.wiki.Pages)
 	page, ok := s.wiki.Pages[name]
 	s.wiki.mu.RUnlock()
 	// NOTE: Is it ok to unlock at this point? Couldn't page be edited or is that fine?

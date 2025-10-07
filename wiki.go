@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -23,10 +22,10 @@ type Page struct {
 	Name string // filename relative to wiki dir without .md
 	Raw  string // raw markdown
 	// Filled after parsing
-	Title     string        // from first heading or Name
-	HTML      template.HTML // The converted markdown
-	Links     []string      // set of outbound page names
-	Backlinks []string      // inbound page names
+	Title     string          // from first '#' heading or Name
+	HTML      template.HTML   // The converted markdown
+	Links     map[string]bool // set of outbound page names
+	Backlinks []string        // inbound page names
 }
 
 // A collection of parsed markdown pages.
@@ -57,8 +56,9 @@ func getPages(dir string) (map[string]*Page, error) {
 				return err
 			}
 			page := &Page{
-				Name: strings.TrimSuffix(d.Name(), ".md"),
-				Raw:  string(b),
+				Name:  strings.TrimSuffix(d.Name(), ".md"),
+				Raw:   string(b),
+				Links: map[string]bool{},
 			}
 			pages[page.Name] = page
 		}
@@ -75,24 +75,26 @@ func getPages(dir string) (map[string]*Page, error) {
 	)
 
 	for _, p := range pages {
-		// find wikilinks
-		links := []string{}
+		// Process wikilinks
 		processed := linkRe.ReplaceAllStringFunc(p.Raw, func(m string) string {
 			sub := linkRe.FindStringSubmatch(m)
 			if len(sub) >= 2 {
 				target := strings.TrimSpace(sub[1])
-				label := target
+				p.Links[target] = true // Add link to page set
+
+				var label string
 				if len(sub) >= 3 {
 					label = strings.TrimSpace(sub[2])
 				}
-				links = append(links, target)
+				if label == "" {
+					label = target
+				}
 				return fmt.Sprintf("[%s](%s)", label, target)
 			}
-			return m // No sub match... weird
+			return m // Match but not right size... empty [[]]?
 		})
-		p.Links = uniqueStrings(links)
 
-		// Render processed markdown to HTML
+		// Render HTML
 		var sb strings.Builder
 		if err := md.Convert([]byte(processed), &sb); err != nil {
 			return nil, err
@@ -101,25 +103,24 @@ func getPages(dir string) (map[string]*Page, error) {
 	}
 
 	// Build backlinks
-	rev := map[string]map[string]struct{}{}
+	pageLinkers := map[string]map[string]struct{}{}
 	for name := range pages {
-		rev[name] = map[string]struct{}{}
+		pageLinkers[name] = map[string]struct{}{}
 	}
-	for from, p := range pages {
-		for _, to := range p.Links {
-			if _, ok := pages[to]; ok {
-				rev[to][from] = struct{}{}
+	for linker, p := range pages {
+		for target := range p.Links {
+			if _, ok := pages[target]; ok {
+				pageLinkers[target][linker] = struct{}{}
 			}
 		}
 	}
-	for name, mset := range rev {
+	for name, mset := range pageLinkers {
 		arr := []string{}
 		for k := range mset {
 			arr = append(arr, k)
 		}
 		pages[name].Backlinks = arr
 	}
-	slog.Debug("page creation", "pages", len(pages))
 	return pages, nil
 }
 
@@ -132,19 +133,4 @@ func (w *Wiki) Update() error {
 	}
 	w.Pages = pages
 	return nil
-}
-
-func uniqueStrings(in []string) []string {
-	set := map[string]struct{}{}
-	out := []string{}
-	for _, s := range in {
-		if s == "" {
-			continue
-		}
-		if _, ok := set[s]; !ok {
-			set[s] = struct{}{}
-			out = append(out, s)
-		}
-	}
-	return out
 }

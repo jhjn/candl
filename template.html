@@ -22,17 +22,15 @@
     <h1>{{.Title}}</h1>
     {{ .Content }}
 </main>
+{{ if .Backlinks }}
 <section class="backlinks">
   <h3>Backlinks</h3>
-  {{ if .Backlinks }}
     <ul>
     {{ range .Backlinks }}
       <li><a href="{{ . }}">{{ . }}</a></li>
     {{ end }}
     </ul>
-  {{ else }}
-    <p>No backlinks.</p>
-  {{ end }}
 </section>
+{{ end }}
 </body>
 </html>
