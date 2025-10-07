@@ -1,7 +1,7 @@
 body {
 	font-family: system-ui;
 	font-size: 16px;
-	max-width: 70ch;
+	max-width: 80ch;
 	margin: auto;
 	padding: 2ch;
 	color: #222;
@@ -43,118 +43,23 @@ body>nav ul {
 }
 
 body>nav ul>li {
-	font-size: 20px;
 	list-style-type: none;
-	display: inline-block;
 	margin-top: 0.5rem;
 	margin-right: 0.5rem;
 }
 
 /* Laptop-specific styling */
 @media screen and (min-width: 900px) {
+	/* side by side body{nav,main} */
+	body {display: flex; gap: 1em}
+	nav  {flex: 1; margin-top: 4em}
+	main {flex: 6}
 
 }
 
 /* Mobile-specific styling */
 @media screen and (max-width: 900px) {
-
-}
-
-/* @media screen and (min-width: 900px) {
-	body {
-		width: 90%;
-		margin-top: 2em;
-		max-width: 100%;
-		display: grid;
-		padding: 0;
-		grid-template-columns: 1.3fr 6fr 0.7fr;
-		grid-template-areas: "nav main ." "nav footer .";
-		column-gap: 3em;
+	body>nav ul>li {
+		display: inline-block; /* sideways nav */
 	}
-
-	body>nav {
-		grid-area: nav;
-		margin-top: 4em;
-		text-align: right;
-	}
-
-	body>main {
-		grid-area: main
-	}
-
-	body>footer {
-		margin-top: 1.5em;
-		grid-area: footer
-	}
-
-	body>nav>ul>li {
-		display: block;
-		margin-right: 0;
-	}
-
-	form#pad {
-		margin-top: 2em;
-	}
-} */
-
-/* For precise styling */
-/* .article {
-	margin-bottom: 1rem;
-	display: flex;
-	flex-direction: column;
 }
-
-.login label {
-	display: block;
-	margin: 10px 0 3px 0;
-}
-
-input {
-	font-size: larger;
-	padding: 2px 5px;
-	margin: 0 0 5px 0;
-	border: 1px solid #777;
-}
-
-.edit-text {
-	width: 100%;
-}
-
-.btn {
-	appearance: none;
-	-webkit-appearance: none;
-	font-size: larger;
-	cursor: pointer;
-	border: 1px solid #ddd;
-	border-radius: 3px;
-}
-
-.btn:hover {
-	background: #c9c9c9;
-}
-
-.btn-blue {
-	border-color: #3079ed;
-	background: #4d90fe;
-	color: #fff;
-}
-
-.btn-blue:hover {
-	background: #357ae8;
-}
-
-.btn-green {
-	border-color: #159437;
-	background: #31b44c;
-	color: #fff;
-}
-
-.btn-green:hover {
-	background: #159437;
-}
-
-.backlinks {
-	margin-top: 3rem;
-	padding-top: 1rem;
-	border-top: 1px solid #eee;
-} */
