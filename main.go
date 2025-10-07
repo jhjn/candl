@@ -19,6 +19,8 @@ import (
 	_ "embed"
 	"flag"
 	"log/slog"
+
+	"github.com/jhjn/candl/server"
 )
 
 func main() {
@@ -32,7 +34,7 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
-	err := Serve(*dir, *port, *watch)
+	err := server.Serve(*dir, *port, *watch)
 	if err != nil {
 		slog.Error("failed to load wiki", "error", err)
 	}
