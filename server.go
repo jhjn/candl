@@ -97,6 +97,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.wiki.Template.Execute(w, map[string]interface{}{
+		"Name":      page.Name,
 		"Title":     page.Title,
 		"Content":   page.HTML,
 		"Backlinks": page.Backlinks,

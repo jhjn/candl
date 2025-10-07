@@ -3,12 +3,12 @@
 <head>
     <title>{{.Title}}</title>
     <meta charset=utf-8>
-    <!-- <meta name=author content="${if(author)}${author}${else}Anonymous${endif}" name=author> -->
     <meta name=viewport content="width=device-width,initial-scale=1">
     <link rel="shortcut icon" href="/favicon.svg"/>
     <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
+<a style="width: 2em; position: fixed; top: 20px; right: 20px;" href="/api/edit/{{.Name}}"><img src="https://openmoji.org/data/color/svg/270F.svg"/></a>
 <nav>
     {{ if .Backlinks }}
     <ul>
