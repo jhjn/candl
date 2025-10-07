@@ -118,7 +118,8 @@ func buildBacklinks(pages map[string]*Page) {
 
 // Only call for files ending in .md
 func loadPage(path string) (*Page, error) {
-	name := strings.TrimSuffix(path, ".md")
+	// NOTE: We are assuming the file is at the root of the wiki
+	name := strings.TrimSuffix(filepath.Base(path), ".md")
 
 	b, err := os.ReadFile(path)
 	if err != nil {
@@ -177,14 +178,9 @@ func loadPages(dir string) (map[string]*Page, error) {
 			return nil
 		}
 		if strings.HasSuffix(d.Name(), ".md") {
-			b, err := os.ReadFile(path)
+			page, err := loadPage(path)
 			if err != nil {
 				return err
-			}
-			page := &Page{
-				Name:  strings.TrimSuffix(d.Name(), ".md"),
-				Raw:   string(b),
-				Links: map[string]bool{},
 			}
 			pages[page.Name] = page
 		}
@@ -201,41 +197,8 @@ func loadPages(dir string) (map[string]*Page, error) {
 		}
 	}
 
-	for _, p := range pages {
-		// Process title (if '# ' get string until newline)
-		if strings.HasPrefix(p.Raw, "# ") && strings.Index(p.Raw, "\n") > 0 {
-			p.Title = strings.TrimSpace(p.Raw[2:strings.Index(p.Raw, "\n")])
-		}
-		// Process wikilinks
-		processed := linkRe.ReplaceAllStringFunc(p.Raw, func(m string) string {
-			sub := linkRe.FindStringSubmatch(m)
-			if len(sub) >= 2 {
-				target := strings.TrimSpace(sub[1])
-				p.Links[target] = true // Add link to page set
-
-				var label string
-				if len(sub) >= 3 {
-					label = strings.TrimSpace(sub[2])
-				}
-				if label == "" {
-					label = target
-				}
-				return fmt.Sprintf("[%s](%s)", label, target)
-			}
-			return m // Match but not right size... empty [[]]?
-		})
-
-		// Render HTML
-		var sb strings.Builder
-		if err := md.Convert([]byte(processed), &sb); err != nil {
-			return nil, err
-		}
-		p.HTML = template.HTML(sb.String())
-	}
-
 	// Build backlinks
 	buildBacklinks(pages)
-
 	return pages, nil
 }
 
