@@ -61,7 +61,7 @@ func (a *Api) servePostEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.wiki.Update(); err != nil {
+	if err := a.wiki.UpdateSingle(name); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

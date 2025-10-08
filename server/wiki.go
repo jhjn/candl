@@ -87,7 +87,7 @@ func sortBacklinks(a, b string) int {
 	return 0 // Should never reach here
 }
 
-// Update page objects to create backlinks from scratch.
+// Update page objects resetting backlinks.
 func buildBacklinks(pages map[string]*Page) {
 	pageLinkers := map[string]map[string]struct{}{}
 	for name := range pages {
@@ -242,13 +242,29 @@ func loadPages(dir string) (map[string]*Page, error) {
 // NOTE: Later handle updating the template if it changes.
 // NOTE: Implement the updating of single files!
 func (w *Wiki) Update() error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
 	pages, err := loadPages(w.Dir)
 	if err != nil {
 		return err
 	}
-	w.mu.Lock()
 	w.Pages = pages
-	w.mu.Unlock()
+	return nil
+}
+
+// Just update the parsed properties of a single page (no backlinks change).
+func (w *Wiki) UpdateSingle(name string) error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	page, err := loadPage(filepath.Join(w.Dir, name+".md"))
+	if err != nil {
+		return err
+	}
+	w.Pages[name] = page
+
+	buildBacklinks(w.Pages)
 	return nil
 }
 

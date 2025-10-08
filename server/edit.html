@@ -154,7 +154,7 @@
         <div class="highlight-layer" id="highlight"></div> <!-- highlight layer underneath -->
         <textarea name="body" id="editor" autofocus spellcheck="false" placeholder="creating /{{.Name}} ...">{{.Markdown}}</textarea>
     </div>
-    <input type="text" id="name-input" class="btn" name="name" value="{{.Name}}" style="padding: 10px 10px">
+    <input type="text" id="name-input" class="btn" name="name" value="{{.Name}}" spellcheck="false" style="padding: 10px 10px">
     <input type="submit" id="save-btn" class="btn btn-blue" value="save">
     <script>
         const editor = document.getElementById('editor');
