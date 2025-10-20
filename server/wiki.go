@@ -48,8 +48,14 @@ type Wiki struct {
 	Dir      string // The only required input
 }
 
-// regex for wikilinks like [[Some Page]] or [[Some Page|Label]]
+// regex for wikilinks like [[some-page]] or [[some-page|My Label]]
+// will return a list: "[[some-page]]", "some-page", ""
+// or                  "[[some-page]]", "some-page", "My Label"
 var linkRe = regexp.MustCompile(`\[\[([^\]|]+)(?:\|([^\]]+))?\]\]`)
+
+func (w *Wiki) getPagePath(name string) string {
+	return filepath.Join(w.Dir, name+".md")
+}
 
 func sortBacklinks(a, b string) int {
 	// Check if strings start with digits
@@ -85,6 +91,21 @@ func sortBacklinks(a, b string) int {
 	}
 
 	return 0 // Should never reach here
+}
+
+func renameWikilinks(content []byte, oldName string, newName string) []byte {
+	return linkRe.ReplaceAllFunc(content, func(m []byte) []byte {
+		sub := linkRe.FindStringSubmatch(string(m))
+		target := strings.TrimSpace(sub[1])
+
+		if target != oldName {
+			return m
+		} else if sub[2] != "" { // There _was_ a label
+			return []byte(fmt.Sprintf("[[%s|%s]]", newName, sub[2]))
+		} else {
+			return []byte(fmt.Sprintf("[[%s]]", newName))
+		}
+	})
 }
 
 // Update page objects resetting backlinks.
@@ -144,10 +165,7 @@ func loadPage(path string) (*Page, error) {
 			target := strings.TrimSpace(sub[1])
 			p.Links[target] = true // Add link to page set
 
-			var label string
-			if len(sub) >= 3 {
-				label = strings.TrimSpace(sub[2])
-			}
+			label := strings.TrimSpace(sub[2]) // empty if no |label
 			if label == "" {
 				label = target
 			}
@@ -258,7 +276,7 @@ func (w *Wiki) UpdateSingle(name string) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	page, err := loadPage(filepath.Join(w.Dir, name+".md"))
+	page, err := loadPage(w.getPagePath(name))
 	if err != nil {
 		return err
 	}
@@ -269,6 +287,37 @@ func (w *Wiki) UpdateSingle(name string) error {
 }
 
 func (w *Wiki) WritePage(name string, content string) error {
-	path := filepath.Join(w.Dir, name+".md")
-	return os.WriteFile(path, []byte(content), 0644)
+	return os.WriteFile(w.getPagePath(name), []byte(content), 0644)
+}
+
+func (w *Wiki) RenamePage(oldName string, newName string) error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	err := os.Rename(w.getPagePath(oldName), w.getPagePath(newName))
+	if err != nil {
+		return err
+	}
+	w.Pages[newName] = w.Pages[oldName]
+	delete(w.Pages, oldName)
+
+	// Now we need to write update all the backlinks to use the new name.
+	for _, linkingPageName := range w.Pages[newName].Backlinks {
+		linkingPage := w.Pages[linkingPageName]
+		// Edit the contents of the page file.
+		newContent := string(renameWikilinks([]byte(linkingPage.Raw), oldName, newName))
+		err = w.WritePage(linkingPageName, newContent)
+		if err != nil {
+			return err
+		}
+		// Update the page object to reflect newly written file.
+		page, err := loadPage(w.getPagePath(linkingPageName))
+		if err != nil {
+			return err
+		}
+		w.Pages[linkingPageName] = page
+	}
+
+	buildBacklinks(w.Pages)
+	return nil
 }

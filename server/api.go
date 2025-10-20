@@ -44,16 +44,34 @@ func (a *Api) serveGetEdit(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func isValidName(name string) bool {
+	matched, err := regexp.MatchString("^[a-zA-Z0-9_+-]+$", name)
+	return err == nil && matched
+}
+
 // Update a page following an edit
 // Be careful - without proper validation this could be used to write arbitrary files
 func (a *Api) servePostEdit(w http.ResponseWriter, r *http.Request) {
-	name := r.PathValue("name")
+	oldName := r.PathValue("name")
 	body := r.FormValue("body")
+	name := r.FormValue("name") // This will differ if the user renamed the file.
 
-	// If page doesn't exist make sure the name is valid!
-	if matched, err := regexp.MatchString("^[a-zA-Z0-9_+-]+$", name); err != nil || !matched {
+	// Make sure the name was valid.
+	if !isValidName(oldName) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
+	}
+
+	// If the user has renamed the page, change that first.
+	if name != oldName {
+		if !isValidName(name) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if err := a.wiki.RenamePage(oldName, name); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if err := a.wiki.WritePage(name, body); err != nil {
