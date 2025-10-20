@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="/favicon.svg"/>
     <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
+<iframe hidden name=htmz onload="setTimeout(()=>document.querySelector(contentWindow.location.hash||null)?.replaceWith(...contentDocument.body.childNodes))"></iframe>
 <body>
-<a style="width: 2em; position: fixed; top: 20px; right: 20px;" href="/api/edit/{{.Name}}" accesskey="e"><img src="https://openmoji.org/data/color/svg/270F.svg"/></a>
 <nav>
     {{ if .Backlinks }}
     <ul>
@@ -20,7 +20,8 @@
     </ul>
     {{ end }}
 </nav>
-<main>
+<main id="content">
+<a style="width: 2em; position: fixed; top: 20px; right: 20px;" href="/api/edit/{{.Name}}#content" accesskey="e" target=htmz><img src="https://openmoji.org/data/color/svg/270F.svg"/></a>
     {{ .Content }}
 </main>
 </body>

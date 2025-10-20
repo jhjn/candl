@@ -7,10 +7,11 @@
     <link rel="shortcut icon" href="/favicon.svg"/>
     <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
+<iframe hidden name=htmz onload="setTimeout(()=>document.querySelector(contentWindow.location.hash||null)?.replaceWith(...contentDocument.body.childNodes))"></iframe>
 <body>
-<div style="margin: auto; display: flex; flex-direction: column; justify-content: center;">
+<div id="content" style="margin: auto; display: flex; flex-direction: column; justify-content: center;">
 <p>404 page not found</p>
-<a class="btn btn-blue" style="text-decoration: none;" href="/api/edit/{{.}}">
+<a class="btn btn-blue" style="text-decoration: none;" href="/api/edit/{{.}}#content" target=htmz>
     create /{{.}}
 </a>
 </div>

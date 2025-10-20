@@ -143,3 +143,117 @@ nav ul {
 	width: 100%;
 	height: 100%;
 }
+
+
+/* edit textarea styling */
+#pad {
+	min-height: 100vh;
+	width: 100%;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+}
+
+#editor {
+	min-height: calc(100vh - 80px);
+	border: none;
+	border-radius: 0;
+	outline: none;
+	resize: none;
+	margin-bottom: 80px; /* Space for buttons */
+	color: var(--text-color);
+	box-sizing: border-box;
+	overflow-y: auto;
+}
+
+#name-input {
+	position: fixed;
+	bottom: 20px;
+	right: 100px;
+	z-index: 1000;
+	background: #ccc;
+	border-radius: 8px;
+}
+
+#save-btn {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 1000;
+}
+
+.btn {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.btn-blue {
+	background-color: #005ec3;
+	color: white;
+}
+
+.btn-blue:hover {
+	background-color: #0056b3;
+	transform: translateY(-2px);
+}
+
+.editor-container textarea,
+.editor-container .highlight-layer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 20px;
+	margin: 0;
+	border: none;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	font-family: Monaco, 'Courier New', monospace;
+	font-size: 14px;
+	line-height: 1.5;
+	box-sizing: border-box;
+	letter-spacing: normal;
+	tab-size: 4;
+}
+
+.editor-container textarea {
+	background: transparent;
+}
+
+.editor-container .highlight-layer {
+	color: transparent;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.highlight-layer span {
+	border-radius: 3px;
+}
+
+.highlight-layer .wiki-link {background: rgb(108, 55, 87)}
+.highlight-layer .header {background: rgb(108, 55, 55)}
+.highlight-layer .code {background: rgb(105, 55, 108)}
+
+@media (max-width: 768px) {
+	.editor-container textarea,
+	.editor-container .highlight-layer {
+		padding: 15px; /* tighter */
+		font-size: 16px; /* Prevents zoom on mobile */
+	}
+	
+	#name-input {
+		bottom: 15px;
+		right: 95px;
+	}
+
+	#save-btn {
+		bottom: 15px; /* tighter */
+		right: 15px;
+	}
+}

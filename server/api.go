@@ -38,6 +38,7 @@ func (a *Api) serveGetEdit(w http.ResponseWriter, r *http.Request) {
 		md = page.Raw
 	}
 
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	editTmpl.Execute(w, map[string]interface{}{
 		"Name":     name,
 		"Markdown": md,
