@@ -12,6 +12,7 @@ import (
 	"sync"
 	"unicode"
 
+	attributes "github.com/mdigger/goldmark-attributes"
 	fences "github.com/stefanfritsch/goldmark-fences"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -25,6 +26,7 @@ var md = goldmark.New(
 	goldmark.WithExtensions(extension.GFM, &fences.Extender{}),
 	goldmark.WithParserOptions(parser.WithAttribute()),
 	goldmark.WithRendererOptions(html.WithUnsafe()),
+	attributes.Enable,
 )
 
 // A parsed wiki page.
